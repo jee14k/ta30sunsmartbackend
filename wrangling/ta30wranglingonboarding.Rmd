@@ -14,7 +14,36 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
+```{r}
+library(dplyr)
+library(readr)
+```
+
+```{r}
+data_dir <- "C:/Users/Jeevan/OneDrive - Monash University/Master of Data Science/Semester 4/FIT5120 - Industry experience Studio Project/Onboarding Project/ta30sunsmartbackend/datafiles"
+
+city_names <- c("adelaide","alice-springs","brisbane","canberra","darwin","emerald","gold-coast","kingston","melbourne","newcastle","perth","sydney","townsville")
+
+# Get all UV dataset files
+uv_files <- list.files(data_dir, pattern = "\\.csv$", full.names = TRUE)
+
+# Loop through each city and combine data from all years
+for (city in city_names) {
+  city_files <- uv_files[grepl(paste0("uv-", city, "-"), uv_files)]  # Match city files
+  
+  if (length(city_files) > 0) {
+    # Read and combine data
+    city_data <- lapply(city_files, read_csv) %>% bind_rows()
+    
+    # Save the combined dataset
+    output_file <- file.path(data_dir, paste0("uv-", city, "-combined.csv"))
+    write_csv(city_data, output_file)
+    
+    print(paste("Saved:", output_file))
+  } else {
+    print(paste("No files found for:", city))
+  }
+}
 
 ```
 
